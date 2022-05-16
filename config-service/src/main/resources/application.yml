@@ -6,8 +6,8 @@ spring:
     config:
       server: 
         git:
-          uri: https://github.com/wetdawgs/config-data.git
-          search-paths: api
+          uri: https://github.com/wetdawgs/dwb2022_2_proyecto.git
+          search-paths: config-data/api
           default-label: "main"
           
   security:
