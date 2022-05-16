@@ -1,0 +1,8 @@
+DROP TABLE IF EXISTS region;
+
+CREATE TABLE region(
+	region_id INT NOT NULL AUTO_INCREMENT,
+    region VARCHAR(100) UNIQUE NOT NULL,
+    status TINYINT NOT NULL,
+    PRIMARY KEY (region_id)
+);
