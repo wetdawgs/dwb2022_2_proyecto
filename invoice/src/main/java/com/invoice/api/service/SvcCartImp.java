@@ -96,10 +96,11 @@ public class SvcCartImp implements SvcCart {
 			ResponseEntity<DtoProduct> response = productCl.getProduct(gtin);
 			if(response.getStatusCode() == HttpStatus.OK)
 				return response.getBody().getStock();
-			else
+			else 
 				return -1;
 		}catch(Exception e) {
-			throw new ApiException(HttpStatus.BAD_REQUEST, "unable to retrieve product information");
+			//throw new ApiException(HttpStatus.BAD_REQUEST, "unable to retrieve product information");
+			return -1;
 		}
 	}
 
