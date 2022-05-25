@@ -62,6 +62,20 @@ public class SvcProductImp implements SvcProduct {
 		}
 		return new ApiResponse("product updated");
 	}
+	
+	@Override
+	public ApiResponse updateProductStock(String gtin, Integer stock) {
+		try {
+			Product p = repo.findByGtinAndStatus(gtin, 1);
+			repo.updateProduct(p.getProduct_id(), gtin, p.getProduct(), p.getDescription(), p.getPrice(), stock);
+		}catch (DataIntegrityViolationException e) {
+			if (e.getLocalizedMessage().contains("gtin"))
+				throw new ApiException(HttpStatus.BAD_REQUEST, "product gtin already exist");
+			if (e.getLocalizedMessage().contains("product"))
+				throw new ApiException(HttpStatus.BAD_REQUEST, "product name already exist");
+		}
+		return new ApiResponse("product stock updated");
+	}
 
 	@Override
 	public ApiResponse deleteProduct(Integer id) {
