@@ -4,6 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import com.invoice.api.dto.DtoProduct;
 
@@ -22,5 +23,8 @@ public interface ProductClient {
 
 	@GetMapping("product/{gtin}")
 	public ResponseEntity<DtoProduct> getProduct(@PathVariable("gtin") String gtin);
+	
+	@PutMapping("product/{gtin}/{quantity}")
+	public void updateProductStock(@PathVariable("gtin") String gtin, @PathVariable("quantity") int quantity);
 
 }
