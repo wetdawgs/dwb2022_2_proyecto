@@ -6,12 +6,11 @@ import java.time.LocalTime;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.invoice.api.controller.CtrlCart;
-import com.invoice.api.controller.CtrlInvoice;
 import com.invoice.api.dto.ApiResponse;
 import com.invoice.api.dto.DtoProduct;
 import com.invoice.api.entity.Cart;
@@ -39,9 +38,6 @@ public class SvcInvoiceImp implements SvcInvoice {
 	
 	@Autowired
 	CtrlCart ctrlCart;
-	
-	@Autowired
-	CtrlInvoice ctrlInvoice;
 
 	@Override
 	public List<Invoice> getInvoices(String rfc) {
@@ -65,32 +61,43 @@ public class SvcInvoiceImp implements SvcInvoice {
 		
 		double total = 0, taxes = 0, subtotal = 0;
 		
+		List<Item> items = new LinkedList<>();
+		
 		for (Cart c : cart) {
 			Item i = new Item();
 			DtoProduct p = productCl.getProduct(c.getGtin()).getBody();
 			i.setUnit_price(p.getPrice());
+			i.setGtin(p.getGtin());
+			i.setQuantity(c.getQuantity());
 			i.setTotal(p.getPrice() * c.getQuantity());
 			i.setTaxes(i.getTotal() * 0.16);
 			i.setSubtotal(i.getTotal() - i.getTaxes());
-			repoItem.save(i);
-			//items.add(i);
+			i.setStatus(1);
+			//repoItem.save(i);
+			items.add(i);
 			total += i.getTotal();
 			taxes += i.getTaxes();
 			subtotal += i.getSubtotal();
-			productCl.updateProductStock(p.getGtin(), c.getQuantity());
+			productCl.updateProductStock(p.getGtin(), p.getStock() - c.getQuantity());
 		}
 		
 		LocalDate hoy = LocalDate.now();
         LocalTime ahora = LocalTime.now();
         LocalDateTime fecha = LocalDateTime.of(hoy, ahora);
         
-		Invoice invoice = new Invoice();
+        Invoice invoice = new Invoice();
 		invoice.setRfc(rfc);
 		invoice.setSubtotal(subtotal);
 		invoice.setTaxes(taxes);
 		invoice.setTotal(total);
 		invoice.setCreated_at(fecha);
+		invoice.setStatus(1);
 		repo.save(invoice);
+		
+		for (Item i : items) {
+			i.setId_invoice(invoice.getInvoice_id());
+			repoItem.save(i);
+    	}
 		
 		ctrlCart.deleteCart(rfc);
 		
